@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ทรัพย์สินครอบครัว</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="s-logo">
+    <div class="s-logo-icon">💰</div>
+    <h1>Family Assets</h1>
+    <span>ทรัพย์สินครอบครัว</span>
+  </div>
+
+  <div class="s-section">
+    <div class="s-label" data-i="nav.overview">Overview</div>
+    <button class="nav-btn active" data-page="dashboard">
+      <span class="ni">◈</span> <span data-i="nav.dashboard">Dashboard</span>
+    </button>
+    <button class="nav-btn" data-page="assets">
+      <span class="ni">◇</span> <span data-i="nav.assets">Assets</span>
+    </button>
+    <button class="nav-btn" data-page="reports">
+      <span class="ni">◉</span> <span data-i="nav.reports">Reports</span>
+    </button>
+  </div>
+
+  <div class="s-section">
+    <div class="s-label" data-i="nav.manage">Manage</div>
+    <button class="nav-btn" data-page="profiles">
+      <span class="ni">◎</span> <span data-i="nav.profiles">Profiles</span>
+    </button>
+    <button class="nav-btn" data-page="settings">
+      <span class="ni">◌</span> <span data-i="nav.settings">Settings</span>
+    </button>
+  </div>
+
+  <div class="s-profiles">
+    <div class="s-label" style="padding:0 2px;margin-bottom:8px" data-i="nav.active">Active</div>
+    <div class="active-profile" onclick="showPage('profiles')">
+      <div class="av av-sm av-c1" id="sidebar-avatar">พ</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:500" id="sidebar-name">Dad · พ่อ</div>
+        <div style="font-size:10.5px;color:var(--muted)" data-i="nav.switch">Switch profile</div>
+      </div>
+      <span style="color:var(--dimmed);font-size:11px">⌄</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<div id="main">
+  <header id="topbar">
+    <span id="page-title" style="font-size:15px;font-weight:500">Dashboard</span>
+    <div class="topbar-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('th')">TH</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openAssetModal()">
+        + <span data-i="btn.addAsset">Add Asset</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="content">
+
+    <!-- ════════════════════════════
+         PAGE: DASHBOARD
+    ════════════════════════════ -->
+    <div id="page-dashboard" class="page">
+
+      <div class="stats-grid">
+        <div class="stat-card sc-gold" style="animation-delay:.04s">
+          <div class="stat-label" data-i="stat.netWorth">Net worth</div>
+          <div class="stat-value mono">฿2,847,500</div>
+          <div class="stat-sub up">↑ +3.2% this month</div>
+        </div>
+        <div class="stat-card sc-green" style="animation-delay:.08s">
+          <div class="stat-label" data-i="stat.realtime">Realtime</div>
+          <div class="stat-value mono">฿1,920,000</div>
+          <div class="stat-sub neu" data-i="stat.realtimeSub">crypto · stock · gold</div>
+        </div>
+        <div class="stat-card sc-blue" style="animation-delay:.12s">
+          <div class="stat-label" data-i="stat.fixed">Fixed assets</div>
+          <div class="stat-value mono">฿927,500</div>
+          <div class="stat-sub neu" data-i="stat.fixedSub">PC · monitors · devices</div>
+        </div>
+        <div class="stat-card sc-purple" style="animation-delay:.16s">
+          <div class="stat-label" data-i="stat.items">Total items</div>
+          <div class="stat-value mono">12</div>
+          <div class="stat-sub neu" data-i="stat.itemsSub">across 4 profiles</div>
+        </div>
+      </div>
+
+      <!-- recent assets table -->
+      <div class="sec-head">
+        <span class="sec-title" data-i="section.recent">Recent assets</span>
+        <button class="btn btn-ghost btn-sm" data-page="assets">
+          <span data-i="btn.viewAll">View all</span> →
+        </button>
+      </div>
+      <div class="card fade-in" style="animation-delay:.18s">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i="th.asset">Asset</th>
+                <th data-i="th.type">Type</th>
+                <th data-i="th.owner">Owner</th>
+                <th data-i="th.capital">ทุน</th>
+                <th data-i="th.current">Current</th>
+                <th data-i="th.pl">P&amp;L</th>
+                <th data-i="th.evidence">Evidence</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="dash-tbody">
+              <!-- rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- bottom grid -->
+      <div class="grid2">
+        <!-- profiles -->
+        <div style="animation-delay:.22s">
+          <div class="sec-head"><span class="sec-title" data-i="section.profiles">Family profiles</span></div>
+          <div class="card" id="dash-profiles"></div>
+        </div>
+        <!-- breakdown -->
+        <div style="animation-delay:.26s">
+          <div class="sec-head"><span class="sec-title" data-i="section.breakdown">Breakdown</span></div>
+          <div class="card card-pad">
+            <div class="bar-row">
+              <div class="bar-head"><span style="color:var(--green)" data-i="type.realtime">Realtime</span><span class="mono">฿1,920,000 · 67%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:67%;background:var(--green)"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-head"><span style="color:var(--blue)" data-i="type.fixed">Fixed</span><span class="mono">฿927,500 · 33%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:33%;background:var(--blue)"></div></div>
+            </div>
+            <hr class="divider">
+            <div class="grid4">
+              <div class="mini-tile"><div class="mt-label">Crypto</div><div class="mt-val" style="color:var(--orange)">฿1,050k</div></div>
+              <div class="mini-tile"><div class="mt-label">Gold</div><div class="mt-val" style="color:var(--gold)">฿222k</div></div>
+              <div class="mini-tile"><div class="mt-label">Stock</div><div class="mt-val" style="color:var(--green)">฿98k</div></div>
+              <div class="mini-tile"><div class="mt-label">Devices</div><div class="mt-val" style="color:var(--blue)">฿77k</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /dashboard -->
+
+    <!-- ════════════════════════════
+         PAGE: ASSETS
+    ════════════════════════════ -->
+    <div id="page-assets" class="page" style="display:none">
+      <div class="sec-head">
+        <span class="sec-title" data-i="nav.assets">Assets</span>
+        <button class="btn btn-primary btn-sm" onclick="openAssetModal()">+ <span data-i="btn.addAsset">Add Asset</span></button>
+      </div>
+      <!-- filter bar -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm filter-btn active" data-filter="all" data-i="filter.all">All</button>
+        <button class="btn btn-ghost btn-sm filter-btn" data-filter="fixed" data-i="filter.fixed">Fixed</button>
+        <button class="btn btn-ghost btn-sm filter-btn" data-filter="crypto" data-i="filter.crypto">Crypto</button>
+        <button class="btn btn-ghost btn-sm filter-btn" data-filter="gold" data-i="filter.gold">Gold</button>
+        <button class="btn btn-ghost btn-sm filter-btn" data-filter="stock" data-i="filter.stock">Stock</button>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i="th.asset">Asset</th>
+                <th data-i="th.type">Type</th>
+                <th data-i="th.owner">Owner</th>
+                <th data-i="th.capital">ทุน</th>
+                <th data-i="th.buyPrice">Buy price/unit</th>
+                <th data-i="th.units">Units</th>
+                <th data-i="th.current">Current</th>
+                <th data-i="th.pl">P&amp;L</th>
+                <th data-i="th.evidence">Evidence</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="assets-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /assets -->
+
+    <!-- ════════════════════════════
+         PAGE: REPORTS
+    ════════════════════════════ -->
+    <div id="page-reports" class="page" style="display:none">
+      <div class="empty"><div class="empty-icon">◉</div><p data-i="empty.reports">Net worth charts and history<br>coming soon</p></div>
+    </div>
+
+    <!-- ════════════════════════════
+         PAGE: PROFILES
+    ════════════════════════════ -->
+    <div id="page-profiles" class="page" style="display:none">
+      <div class="sec-head">
+        <span class="sec-title" data-i="nav.profiles">Profiles</span>
+      </div>
+      <div class="profile-grid" id="profiles-grid"></div>
+    </div>
+
+    <!-- ════════════════════════════
+         PAGE: SETTINGS
+    ════════════════════════════ -->
+    <div id="page-settings" class="page" style="display:none">
+      <div class="settings-group">
+        <h3 data-i="settings.lang">Language</h3>
+        <div class="setting-row">
+          <div><div class="sr-label" data-i="settings.langLabel">Display language</div><div class="sr-sub">TH · ภาษาไทย / EN · English</div></div>
+          <div class="lang-toggle">
+            <button class="lang-btn active" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" onclick="setLang('th')">TH</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h3 data-i="settings.data">Data</h3>
+        <div class="setting-row">
+          <div><div class="sr-label" data-i="settings.exportLabel">Export data</div><div class="sr-sub" data-i="settings.exportSub">Save all data as JSON</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportData()">Export JSON</button>
+        </div>
+        <div class="setting-row">
+          <div><div class="sr-label" data-i="settings.clearLabel">Clear all data</div><div class="sr-sub" data-i="settings.clearSub">Remove everything from localStorage</div></div>
+          <button class="btn btn-danger btn-sm" onclick="if(confirm('Clear all data?')){localStorage.clear();location.reload();}">Clear</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h3 data-i="settings.evidence">Evidence folder</h3>
+        <div class="setting-row">
+          <div>
+            <div class="sr-label">evidence/</div>
+            <div class="sr-sub" data-i="settings.evidenceSub">Put image files in /evidence/ folder next to index.html</div>
+          </div>
+          <span style="font-size:11px;color:var(--muted)">local folder</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══════════════════════════════════════════
+     MODAL: ADD / EDIT ASSET
+══════════════════════════════════════════ -->
+<div id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="asset-modal">
+    <div class="modal-head">
+      <span class="modal-title" id="modal-title" data-i="modal.addAsset">Add Asset</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- step indicator -->
+      <div class="steps-bar">
+        <div class="step-item on" id="si-1"><div class="step-dot">1</div><span data-i="step.type">Type</span></div>
+        <div class="step-line"></div>
+        <div class="step-item" id="si-2"><div class="step-dot">2</div><span data-i="step.details">Details</span></div>
+        <div class="step-line"></div>
+        <div class="step-item" id="si-3"><div class="step-dot">3</div><span data-i="step.evidence">Evidence</span></div>
+      </div>
+
+      <!-- ── STEP 1: type select ── -->
+      <div id="modal-s1">
+        <div class="type-grid">
+          <div class="type-card sel" id="tc-fixed" onclick="selType('fixed')">
+            <div class="tc-icon">🖥</div>
+            <div class="tc-name" data-i="type.fixed">Fixed</div>
+            <div class="tc-sub" data-i="type.fixedSub">PC, monitor</div>
+          </div>
+          <div class="type-card" id="tc-crypto" onclick="selType('crypto')">
+            <div class="tc-icon">₿</div>
+            <div class="tc-name" data-i="type.crypto">Crypto</div>
+            <div class="tc-sub" data-i="type.cryptoSub">BTC, ETH…</div>
+          </div>
+          <div class="type-card" id="tc-gold" onclick="selType('gold')">
+            <div class="tc-icon">🪙</div>
+            <div class="tc-name" data-i="type.gold">Gold</div>
+            <div class="tc-sub" data-i="type.goldSub">สตางค์, บาท</div>
+          </div>
+          <div class="type-card" id="tc-stock" onclick="selType('stock')">
+            <div class="tc-icon">📈</div>
+            <div class="tc-name" data-i="type.stock">Stock</div>
+            <div class="tc-sub" data-i="type.stockSub">Thai / US</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label data-i="field.owner">Owner</label>
+          <select class="sel" id="f-owner"></select>
+        </div>
+        <div class="field">
+          <label data-i="field.name">Asset name</label>
+          <input class="inp" id="f-name" type="text" placeholder="e.g. Bitcoin, ทองคำ, PTT…">
+        </div>
+      </div>
+
+      <!-- ── STEP 2a: FIXED ── -->
+      <div id="modal-s2-fixed" style="display:none">
+        <div class="form-section-title" data-i="section.fixedDetails">Fixed asset details</div>
+        <div class="field">
+          <label data-i="field.category">Category</label>
+          <select class="sel" id="f-category">
+            <option value="pc">Computer / PC</option>
+            <option value="monitor">Monitor</option>
+            <option value="laptop">Laptop</option>
+            <option value="phone">Phone / Tablet</option>
+            <option value="other">Other device</option>
+          </select>
+        </div>
+        <div class="inp-row col2">
+          <div class="field">
+            <label data-i="field.purchasePrice">Purchase price (฿)</label>
+            <div class="inp-prefix"><span class="prefix">฿</span><input class="inp" id="f-fixed-price" type="number" placeholder="65000"></div>
+          </div>
+          <div class="field">
+            <label data-i="field.purchaseDate">Date purchased</label>
+            <input class="inp" id="f-fixed-date" type="date">
+          </div>
+        </div>
+        <div class="field">
+          <label data-i="field.notes">Notes / Serial no.</label>
+          <input class="inp" id="f-fixed-notes" type="text" placeholder="Specs, serial number…">
+        </div>
+      </div>
+
+      <!-- ── STEP 2b: CRYPTO ── -->
+      <div id="modal-s2-crypto" style="display:none">
+        <div class="form-section-title" data-i="section.cryptoDetails">Crypto details</div>
+        <div class="field">
+          <label data-i="field.coin">Coin / Token</label>
+          <select class="sel" id="f-coin">
+            <option value="BTC">BTC — Bitcoin</option>
+            <option value="ETH">ETH — Ethereum</option>
+            <option value="BNB">BNB — BNB</option>
+            <option value="SOL">SOL — Solana</option>
+            <option value="USDT">USDT — Tether</option>
+            <option value="OTHER">Other (custom)</option>
+          </select>
+        </div>
+        <div id="f-coin-custom-wrap" style="display:none" class="field">
+          <label data-i="field.customSymbol">Custom symbol</label>
+          <input class="inp" id="f-coin-custom" type="text" placeholder="e.g. DOGE">
+        </div>
+        <div class="field">
+          <label data-i="field.currency">Currency used to buy</label>
+          <select class="sel" id="f-crypto-currency">
+            <option value="THB">THB ฿</option>
+            <option value="USD">USD $</option>
+            <option value="USDT">USDT</option>
+          </select>
+        </div>
+        <div class="inp-row col2">
+          <div class="field">
+            <label data-i="field.capital">ทุน (Capital invested)</label>
+            <div class="inp-prefix"><span class="prefix" id="crypto-prefix">฿</span>
+              <input class="inp" id="f-crypto-capital" type="number" placeholder="30000" oninput="calcUnits('crypto')">
+            </div>
+          </div>
+          <div class="field">
+            <label data-i="field.priceAtBuy">Price per coin at buy</label>
+            <div class="inp-prefix"><span class="prefix" id="crypto-price-prefix">฿</span>
+              <input class="inp" id="f-crypto-buyprice" type="number" placeholder="2500000" oninput="calcUnits('crypto')">
+            </div>
+          </div>
+        </div>
+        <div class="calc-box" id="calc-crypto">
+          <span>—</span> <span style="color:var(--muted);font-size:11px;font-family:var(--font)" data-i="calc.units">units you hold (calculated)</span>
+        </div>
+        <div class="field">
+          <label data-i="field.buyDate">Date purchased</label>
+          <input class="inp" id="f-crypto-date" type="date">
+        </div>
+        <div class="field">
+          <label data-i="field.exchange">Exchange / Wallet</label>
+          <input class="inp" id="f-crypto-exchange" type="text" placeholder="Bitkub, Binance, MetaMask…">
+        </div>
+      </div>
+
+      <!-- ── STEP 2c: GOLD ── -->
+      <div id="modal-s2-gold" style="display:none">
+        <div class="form-section-title" data-i="section.goldDetails">Gold details</div>
+        <div class="field">
+          <label data-i="field.goldType">Gold type</label>
+          <select class="sel" id="f-gold-type">
+            <option value="baht_gold">ทองคำแท่ง (Baht gold bar)</option>
+            <option value="jewelry">ทองรูปพรรณ (Jewelry gold)</option>
+            <option value="xau">XAU — Spot gold</option>
+          </select>
+        </div>
+        <div class="inp-row col2">
+          <div class="field">
+            <label data-i="field.capital">ทุน (Capital invested ฿)</label>
+            <div class="inp-prefix"><span class="prefix">฿</span>
+              <input class="inp" id="f-gold-capital" type="number" placeholder="30000" oninput="calcUnits('gold')">
+            </div>
+          </div>
+          <div class="field">
+            <label data-i="field.pricePerUnit">ราคาทองต่อบาท ณ วันซื้อ</label>
+            <div class="inp-prefix"><span class="prefix">฿</span>
+              <input class="inp" id="f-gold-buyprice" type="number" placeholder="67000" oninput="calcUnits('gold')">
+            </div>
+          </div>
+        </div>
+        <div class="calc-box" id="calc-gold">
+          <span>—</span> <span style="color:var(--muted);font-size:11px;font-family:var(--font)" data-i="calc.goldUnits">บาททองที่ได้ (calculated)</span>
+        </div>
+        <div class="inp-row col2">
+          <div class="field">
+            <label data-i="field.buyDate">วันที่ซื้อ</label>
+            <input class="inp" id="f-gold-date" type="date">
+          </div>
+          <div class="field">
+            <label data-i="field.shop">ร้านทอง / Shop</label>
+            <input class="inp" id="f-gold-shop" type="text" placeholder="ร้านทองชื่อ…">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 2d: STOCK ── -->
+      <div id="modal-s2-stock" style="display:none">
+        <div class="form-section-title" data-i="section.stockDetails">Stock details</div>
+        <div class="inp-row col2">
+          <div class="field">
+            <label data-i="field.market">Market</label>
+            <select class="sel" id="f-stock-market">
+              <option value="SET">SET (Thailand)</option>
+              <option value="US">US (NYSE / NASDAQ)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i="field.ticker">Ticker symbol</label>
+            <input class="inp" id="f-stock-ticker" type="text" placeholder="PTT, CPALL, AAPL…" style="text-transform:uppercase">
+          </div>
+        </div>
+        <div class="inp-row col2">
+          <div class="field">
+            <label data-i="field.capital">ทุน (Capital invested ฿)</label>
+            <div class="inp-prefix"><span class="prefix">฿</span>
+              <input class="inp" id="f-stock-capital" type="number" placeholder="50000" oninput="calcUnits('stock')">
+            </div>
+          </div>
+          <div class="field">
+            <label data-i="field.priceAtBuy">ราคาต่อหุ้นตอนซื้อ (฿)</label>
+            <div class="inp-prefix"><span class="prefix">฿</span>
+              <input class="inp" id="f-stock-buyprice" type="number" placeholder="35.50" oninput="calcUnits('stock')">
+            </div>
+          </div>
+        </div>
+        <div class="calc-box" id="calc-stock">
+          <span>—</span> <span style="color:var(--muted);font-size:11px;font-family:var(--font)" data-i="calc.shares">shares / หุ้น (calculated)</span>
+        </div>
+        <div class="inp-row col2">
+          <div class="field">
+            <label data-i="field.buyDate">Date purchased</label>
+            <input class="inp" id="f-stock-date" type="date">
+          </div>
+          <div class="field">
+            <label data-i="field.broker">Broker</label>
+            <input class="inp" id="f-stock-broker" type="text" placeholder="Settrade, IBKR…">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: EVIDENCE ── -->
+      <div id="modal-s3" style="display:none">
+        <div class="form-section-title" data-i="section.evidence">Evidence / proof</div>
+        <div class="ev-zone" id="ev-zone">
+          <input type="file" id="f-evidence" accept="image/*,.pdf" onchange="handleEvidence(this)">
+          <div class="ev-icon">🖼</div>
+          <div class="ev-text" data-i="ev.text">Click or drag image / PDF</div>
+          <div class="ev-sub" data-i="ev.sub">Receipt, statement, screenshot — saved in /evidence/ folder</div>
+        </div>
+        <div class="ev-preview" id="ev-preview">
+          <img id="ev-preview-img" src="" alt="preview">
+          <div>
+            <div class="ev-fname" id="ev-fname"></div>
+            <div class="ev-size" id="ev-size"></div>
+          </div>
+          <button class="btn-icon" onclick="clearEvidence()" title="Remove">✕</button>
+        </div>
+        <div style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.7" data-i="ev.instruction">
+          Save the file manually to the <code style="background:var(--bg3);padding:1px 5px;border-radius:4px;font-family:var(--mono);color:var(--text)">evidence/</code> folder next to index.html.<br>
+          The filename is saved and linked to this asset.
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" id="btn-back" style="display:none" onclick="modalBack()">← <span data-i="btn.back">Back</span></button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()"><span data-i="btn.cancel">Cancel</span></button>
+      <button class="btn btn-primary btn-sm" id="btn-next" onclick="modalNext()"><span data-i="btn.next">Next →</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: ADD / EDIT PROFILE
+══════════════════════════════════════════ -->
+<div id="overlay-profile" onclick="if(event.target===this)closeProfileModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div class="modal" style="width:400px">
+    <div class="modal-head">
+      <span class="modal-title" id="pm-title" data-i="modal.addProfile">Add Profile</span>
+      <button class="modal-close" onclick="closeProfileModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label data-i="field.displayName">Display name</label>
+        <input class="inp" id="pm-name" type="text" placeholder="Dad · พ่อ">
+      </div>
+      <div class="field">
+        <label data-i="field.initials">Initials (1–2 chars)</label>
+        <input class="inp" id="pm-initials" type="text" placeholder="พ" maxlength="2">
+      </div>
+      <div class="field">
+        <label data-i="field.color">Avatar color</label>
+        <div class="color-picker">
+          <div class="color-swatch selected" data-color="av-c1" style="background:rgba(240,192,64,.5)" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="av-c2" style="background:rgba(96,168,240,.5)" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="av-c3" style="background:rgba(61,214,140,.5)" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="av-c4" style="background:rgba(240,96,96,.5)" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="av-c5" style="background:rgba(164,127,240,.5)" onclick="selectColor(this)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeProfileModal()" data-i="btn.cancel">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveProfile()" data-i="btn.save">Save</button>
+    </div>
+  </div>
+</div>
+
+</body>
+<script src="js/script.js"></script>
+</html>
