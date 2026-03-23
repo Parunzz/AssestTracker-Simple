@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --border: #252535;
+    --accent: #7c6ff7;
+    --accent2: #f7c16f;
+    --danger: #f76f7c;
+    --success: #6ff7b8;
+    --text: #e8e8f0;
+    --muted: #666680;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: var(--mono);
+  }
+
+  /* Summary cards */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .sum-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sum-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .sum-card.total::before { background: var(--accent); }
+  .sum-card.expense::before { background: var(--danger); }
+  .sum-card.net::before { background: var(--success); }
+
+  .sum-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-bottom: 8px;
+  }
+
+  .sum-value {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .sum-card.total .sum-value { color: var(--accent); }
+  .sum-card.expense .sum-value { color: var(--danger); }
+  .sum-card.net .sum-value { color: var(--success); }
+
+  /* Add form */
+  .add-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  input, select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus { border-color: var(--accent); }
+
+  input::placeholder { color: var(--muted); }
+
+  select option { background: var(--card); }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #9087f9; transform: translateY(-1px); }
+
+  .btn-danger {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+
+  .btn-sm {
+    padding: 5px 10px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-bar input, .filter-bar select {
+    flex: 1;
+    min-width: 140px;
+    max-width: 220px;
+  }
+
+  .count-badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* Table */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: var(--surface);
+    padding: 12px 16px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  thead th:hover { color: var(--text); }
+
+  thead th.sorted { color: var(--accent); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(124,111,247,0.05); }
+
+  td {
+    padding: 13px 16px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  .td-name { font-weight: 500; }
+
+  .td-amount {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent2);
+  }
+
+  .td-expense {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--danger);
+  }
+
+  .td-net {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .td-net.pos { color: var(--success); }
+  .td-net.neg { color: var(--danger); }
+
+  .category-tag {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 700;
+    border: 1px solid;
+  }
+
+  .td-date { color: var(--muted); font-size: 12px; font-family: var(--mono); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+
+  /* Toasts */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--success);
+    color: #0a0a0f;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 999;
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 1.7s forwards;
+  }
+
+  .toast.err { background: var(--danger); }
+
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+  /* Category colors */
+  .cat-stock { color: #7c6ff7; border-color: #7c6ff7; background: rgba(124,111,247,0.1); }
+  .cat-crypto { color: #f7c16f; border-color: #f7c16f; background: rgba(247,193,111,0.1); }
+  .cat-property { color: #6ff7b8; border-color: #6ff7b8; background: rgba(111,247,184,0.1); }
+  .cat-cash { color: #6fb8f7; border-color: #6fb8f7; background: rgba(111,184,247,0.1); }
+  .cat-other { color: #d46ff7; border-color: #d46ff7; background: rgba(212,111,247,0.1); }
+
+  /* Import/Export */
+  .io-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  @media (max-width: 700px) {
+    .form-row { grid-template-columns: 1fr 1fr; }
+    .form-row .field:first-child { grid-column: 1 / -1; }
+    .form-row .btn-primary { grid-column: 1 / -1; }
+    .summary { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div>
+      <div class="logo">asset<span>//</span>tracker</div>
+      <div class="subtitle">manual input · localStorage · no server needed</div>
+    </div>
+    <div class="io-row">
+      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn-outline btn-sm" onclick="clearAll()">🗑 Clear All</button>
+    </div>
+  </header>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="sum-card total">
+      <div class="sum-label">Total Assets</div>
+      <div class="sum-value" id="totalAssets">฿0.00</div>
+    </div>
+    <div class="sum-card expense">
+      <div class="sum-label">Total Expenses</div>
+      <div class="sum-value" id="totalExpenses">฿0.00</div>
+    </div>
+    <div class="sum-card net">
+      <div class="sum-label">Net Value</div>
+      <div class="sum-value" id="netValue">฿0.00</div>
+    </div>
+  </div>
+
+  <!-- Add Form -->
+  <div class="add-section">
+    <div class="section-title">+ Add Asset / Expense</div>
+    <div class="form-row">
+      <div class="field">
+        <label>Name</label>
+        <input id="inp-name" type="text" placeholder="e.g. Bitcoin, Condo, Salary..." />
+      </div>
+      <div class="field">
+        <label>Amount (฿)</label>
+        <input id="inp-amount" type="number" placeholder="0.00" step="0.01" />
+      </div>
+      <div class="field">
+        <label>Expense (฿)</label>
+        <input id="inp-expense" type="number" placeholder="0.00" step="0.01" />
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="inp-cat">
+          <option value="stock">Stock</option>
+          <option value="crypto">Crypto</option>
+          <option value="property">Property</option>
+          <option value="cash">Cash</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="addAsset()">Add</button>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <input id="search" type="text" placeholder="Search name..." oninput="renderTable()" style="max-width:200px" />
+    <select id="filter-cat" onchange="renderTable()" style="max-width:160px">
+      <option value="">All Categories</option>
+      <option value="stock">Stock</option>
+      <option value="crypto">Crypto</option>
+      <option value="property">Property</option>
+      <option value="cash">Cash</option>
+      <option value="other">Other</option>
+    </select>
+    <span class="count-badge" id="count-badge">0 items</span>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('name')">Name</th>
+          <th onclick="sortBy('category')">Category</th>
+          <th onclick="sortBy('amount')">Amount</th>
+          <th onclick="sortBy('expense')">Expense</th>
+          <th onclick="sortBy('net')">Net</th>
+          <th onclick="sortBy('date')">Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="7"><div class="empty-state"><div class="icon">📦</div>No assets yet. Add one above.</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  const STORAGE_KEY = 'asset_tracker_v1';
+  let assets = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let sortKey = 'date';
+  let sortDir = -1;
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(assets));
+  }
+
+  function fmt(n) {
+    return '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function addAsset() {
+    const name = document.getElementById('inp-name').value.trim();
+    const amount = parseFloat(document.getElementById('inp-amount').value) || 0;
+    const expense = parseFloat(document.getElementById('inp-expense').value) || 0;
+    const category = document.getElementById('inp-cat').value;
+
+    if (!name) { toast('Name is required!', true); return; }
+    if (amount === 0 && expense === 0) { toast('Enter amount or expense!', true); return; }
+
+    const entry = {
+      id: Date.now().toString(),
+      name, amount, expense,
+      category,
+      date: new Date().toISOString().split('T')[0]
+    };
+
+    assets.unshift(entry);
+    save();
+    renderAll();
+    toast('Asset added!');
+
+    document.getElementById('inp-name').value = '';
+    document.getElementById('inp-amount').value = '';
+    document.getElementById('inp-expense').value = '';
+  }
+
+  function deleteAsset(id) {
+    assets = assets.filter(a => a.id !== id);
+    save();
+    renderAll();
+    toast('Deleted.');
+  }
+
+  function sortBy(key) {
+    if (sortKey === key) sortDir *= -1;
+    else { sortKey = key; sortDir = 1; }
+    document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+    renderAll();
+  }
+
+  function getFiltered() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const cat = document.getElementById('filter-cat').value;
+    return assets.filter(a =>
+      (!q || a.name.toLowerCase().includes(q)) &&
+      (!cat || a.category === cat)
+    );
+  }
+
+  function renderAll() {
+    renderSummary();
+    renderTable();
+  }
+
+  function renderSummary() {
+    const totalA = assets.reduce((s, a) => s + a.amount, 0);
+    const totalE = assets.reduce((s, a) => s + a.expense, 0);
+    document.getElementById('totalAssets').textContent = fmt(totalA);
+    document.getElementById('totalExpenses').textContent = fmt(totalE);
+    const net = totalA - totalE;
+    const netEl = document.getElementById('netValue');
+    netEl.textContent = fmt(net);
+    netEl.style.color = net >= 0 ? 'var(--success)' : 'var(--danger)';
+  }
+
+  function renderTable() {
+    const data = getFiltered().slice().sort((a, b) => {
+      let va = a[sortKey] ?? (sortKey === 'net' ? a.amount - a.expense : '');
+      let vb = b[sortKey] ?? (sortKey === 'net' ? b.amount - b.expense : '');
+      if (sortKey === 'net') { va = a.amount - a.expense; vb = b.amount - b.expense; }
+      if (typeof va === 'string') return va.localeCompare(vb) * sortDir;
+      return (va - vb) * sortDir;
+    });
+
+    document.getElementById('count-badge').textContent = data.length + ' items';
+
+    const tbody = document.getElementById('table-body');
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">🔍</div>No matching assets.</div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(a => {
+      const net = a.amount - a.expense;
+      return `
+        <tr>
+          <td class="td-name">${esc(a.name)}</td>
+          <td><span class="category-tag cat-${a.category}">${a.category}</span></td>
+          <td class="td-amount">${fmt(a.amount)}</td>
+          <td class="td-expense">${fmt(a.expense)}</td>
+          <td class="td-net ${net >= 0 ? 'pos' : 'neg'}">${fmt(net)}</td>
+          <td class="td-date">${a.date}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteAsset('${a.id}')">Del</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function exportCSV() {
+    if (!assets.length) { toast('Nothing to export!', true); return; }
+    const rows = [['Name','Category','Amount','Expense','Net','Date']];
+    assets.forEach(a => rows.push([a.name, a.category, a.amount, a.expense, a.amount - a.expense, a.date]));
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url; link.download = 'assets_' + new Date().toISOString().split('T')[0] + '.csv';
+    link.click();
+    toast('CSV exported!');
+  }
+
+  function clearAll() {
+    if (!confirm('Delete ALL assets? This cannot be undone.')) return;
+    assets = [];
+    save();
+    renderAll();
+    toast('Cleared.');
+  }
+
+  function toast(msg, err = false) {
+    const el = document.createElement('div');
+    el.className = 'toast' + (err ? ' err' : '');
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2100);
+  }
+
+  // Enter key on inputs
+  ['inp-name','inp-amount','inp-expense'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') addAsset();
+    });
+  });
+
+  renderAll();
+</script>
+</body>
+</html>
